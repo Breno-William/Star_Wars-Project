@@ -1,6 +1,6 @@
 <h1>Star_Wars-Project</h1>
 
->status:developing
+>status: developing
 
 <h2>Frontend</h2>
 
