@@ -2,7 +2,7 @@
 
 >status: developing
 
-<h2>Frontend</h2>
+<h2>WEB</h2>
 
 ```bash
 npm install
