@@ -1,17 +1,31 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, session
+from flask_jwt_extended import create_access_token
+from flask_jwt_extended import get_jwt_identity
+from flask_jwt_extended import jwt_required
+from flask_jwt_extended import JWTManager
+from flask_cors import CORS
 from config import ApplicationConfig
 from flask_bcrypt import Bcrypt
+from flask_session import Session
 from models import db, User
 
 app = Flask(__name__)
 
 app.config.from_object(ApplicationConfig)
 
+app.config["JWT_SECRET_KEY"] = "SECRET_KEY"
+jwt = JWTManager(app)
+
 bcrypt = Bcrypt(app)
+CORS(app, supports_credentials=True)
 db.init_app(app)
 
 with app.app_context():
   db.create_all()
+
+# -------------------- Current User ------------------------
+
+
 
 # -------------------- Register ---------------------
 
@@ -40,6 +54,8 @@ def register_user():
 
   })
 
+# ------------------- Login ------------------------
+
 @app.route("/login", methods=["POST"])
 def login_user(): 
   email = request.json["email"]
@@ -53,10 +69,14 @@ def login_user():
   if not bcrypt.check_password_hash(user.password, password):
     return jsonify({"error": "Unauthorized"}), 401
 
-  return jsonify({
-    "id": user.id,
-    "email": user.email
-  })
-  
+  access_token = create_access_token(identity=email)
+  return jsonify(access_token=access_token)
+
+
+  # return jsonify({
+  #   "id": user.id,
+  #   "email": user.email
+  # })
+
 if __name__ == "__main__":
   app.run(debug=True)
